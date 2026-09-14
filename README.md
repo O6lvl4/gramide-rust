@@ -27,11 +27,13 @@ Every `.rs` file under `crates`, `tests`, `runtime`, `src` and `tools` of the
 | 1 file `rustfmt` rejects | parses — it uses `gen` as a name in an edition that reserves it, a name-resolution question, not a syntax one |
 
 The guarantee runs one way: a file this package rejects is broken for
-`rustfmt` too. 15.7 MB parse in 2.4 s on one core, 6.6 MB/s, the same rate as
-the Go grammar. Against a tree-sitter binary, an outline of 120 Rust files and
-2.95 MB took 0.333 s to its 0.155 s with process startup subtracted, from
-0.73 s before the engine work recorded in
-[gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md).
+`rustfmt` too. Every `.rs` file in the compiler repository today — 1,022
+files, 17.3 MB — checks in **0.104 s** in one process, 166 MB/s, with the
+same four files rejected before and after the expression ladder below was
+folded ([evidence](docs/evidence/corpus-check-rust.json)); when this grammar
+was written the same corpus took 2.4 s on one core, and the engine work
+recorded in [gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md)
+is the difference.
 
 Structured ranges keep an item's envelope: `#[inline] pub fn read` starts at
 the attribute, and a method is named with the type it is implemented on —
@@ -57,8 +59,12 @@ body is a function, not a method. Each of these is a test in
   context-dependent place is the struct literal, exactly as in Go: `if x == T { }`
   must not read `T { }` as a value, so the expression rules are generated
   twice from one function and the headers of `if`, `while`, `for` and `match`
-  use the second. A macro body or an attribute's contents is a balanced run of
-  tokens with no reading. A `decl_head` rule keeps a half-typed item's name.
+  use the second. The nine binary levels are three `prec` ladders around the
+  one level a ladder cannot hold — a shift's `>>` is two `>` tokens, so that
+  `Vec<Vec<T>>` closes — with `cmp` a rule of its own because a `let` chain's
+  scrutinee stops there. A macro body or an attribute's contents is a balanced
+  run of tokens with no reading. A `decl_head` rule keeps a half-typed item's
+  name.
 - **`src/symbols.almd`** — functions, methods, trait method signatures,
   types, lets, variants, fields, impls, mods and macros declare names; an
   `impl` or a type owns its methods; a `mod` qualifies what is inside it;

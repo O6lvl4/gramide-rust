@@ -24,11 +24,12 @@ almide build cli/main.almd -o gramide_rust     # .rs だけの gramide
 | 826 ファイル | すべてパース。`rustfmt --edition 2024` が受理するのもちょうどこの 826 |
 | `rustfmt` が拒否する 1 ファイル | パースは通る — 予約された edition で `gen` を名前に使っており、構文ではなく名前解決の問題 |
 
-保証は一方向です。このパッケージが拒否するファイルは `rustfmt` にとっても壊れている。15.7 MB を
-1 コア 2.4 秒、6.6 MB/s で、Go 文法と同じ速さです。tree-sitter のバイナリに対しては、Rust 120
-ファイル・2.95 MB のアウトラインがプロセス起動を差し引いて 0.333 秒対 0.155 秒。
-[gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md) に記録された
-エンジンの仕事の前は 0.73 秒でした。
+保証は一方向です。このパッケージが拒否するファイルは `rustfmt` にとっても壊れている。今日の
+コンパイラリポジトリの全 `.rs` — 1,022 ファイル、17.3 MB — は 1 プロセス **0.104 秒**、166 MB/s で
+検査でき、下記の式の梯子を畳む前後で拒否する 4 ファイルは同じです
+（[証拠](docs/evidence/corpus-check-rust.json)）。この文法を書いた時点では同じコーパスが 1 コア
+2.4 秒で、[gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md) に記録された
+エンジンの仕事がその差です。
 
 構造化範囲は item のエンベロープを保ちます。`#[inline] pub fn read` は属性から始まり、
 メソッドは実装先の型で名付けられます — `impl fmt::Display for S` の下の `S::fmt`。trait と型は
@@ -48,8 +49,10 @@ almide build cli/main.almd -o gramide_rust     # .rs だけの gramide
 - **`src/grammar.almd`** — item、型、パターン、優先順位の梯子としての式、クロージャ、let チェーン、
   修飾パス。文脈に依存する唯一の箇所は構造体リテラルで、Go とまったく同じです。`if x == T { }` で
   `T { }` を値として読んではいけないので、式の規則を 1 つの関数から 2 通り生成し、`if`・`while`・
-  `for`・`match` のヘッダは後者を使います。マクロ本体と属性の中身は読まずに、括弧の釣り合った
-  トークンの並びとして扱います。`decl_head` 規則は書きかけの item の名前を残します。
+  `for`・`match` のヘッダは後者を使います。二項演算子の 9 段は、梯子に乗らない 1 段（シフトの `>>`
+  は `Vec<Vec<T>>` を閉じるために `>` 2 トークン）を挟んだ 3 つの `prec` 梯子で、`cmp` は `let`
+  チェーンの被検査式がそこで止まるので独立した規則のままです。マクロ本体と属性の中身は読まずに、
+  括弧の釣り合ったトークンの並びとして扱います。`decl_head` 規則は書きかけの item の名前を残します。
 - **`src/symbols.almd`** — 関数・メソッド・trait のメソッドシグネチャ・型・let・variant・field・
   impl・mod・macro が名前を宣言し、`impl` と型がメソッドを所有し、`mod` はその中を修飾し、
   `item_envelope` は包む宣言に開始位置を貸します。

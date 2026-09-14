@@ -1,0 +1,26 @@
+{
+  "platform": "macOS-15.4.1-arm64-arm-64bit",
+  "binary_sha256": "a2fb81a99989f60d5dcd816a374914c209646a809d1592a1b55463895db3b2fb",
+  "mode": "`check` over a whole corpus, 2000 files to a process, median of 5 passes; startup is paid once a chunk, not once a file",
+  "root": "/Users/o6lvl4/workspace/github.com/almide/almide",
+  "ext": ".rs",
+  "excluded": [
+    ".claude",
+    ".git",
+    "research",
+    "target",
+    "worktrees"
+  ],
+  "files": 1022,
+  "bytes": 17297519,
+  "processes": 1,
+  "seconds": 0.1043003749800846,
+  "megabytes_per_second": 165.8433059641716,
+  "rejected_lines": 4,
+  "largest": {
+    "path": "crates/almide-codegen/src/generated/rust_runtime.rs",
+    "lines": 53,
+    "bytes": 556200,
+    "milliseconds": 4.405166022479534
+  }
+}

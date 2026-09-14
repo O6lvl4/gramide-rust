@@ -18,7 +18,7 @@ import gramide.names as nametable
 import gramide.tree
 import gramide.parser
 import gramide.lex
-import gramide.parser.{ tok, lit, keep, r, seq, alt, rep, rep1, opt, wrap, field, ahead, nott, leftf, lits, keeps, any, grammar, recover, recover_all_keeping }
+import gramide.parser.{ tok, lit, keep, r, seq, alt, rep, rep1, opt, wrap, field, ahead, nott, leftf, prec, lits, keeps, any, grammar, recover, recover_all_keeping }
 import self.lexer
 
 // ── the grammar ───────────────────────────────────────────────────────────
@@ -87,15 +87,16 @@ fn expr_rules(sfx: String, structs: Bool) -> List[(String, parser.Rule)] = {
     ("range" + sfx, alt([
        seq([lits(["..=", ".."]), opt(r("or" + sfx))]),
        seq([r("or" + sfx), opt(seq([lits(["..=", ".."]), opt(r("or" + sfx))]))])])),
-    ("or" + sfx, leftf("binary", r("and" + sfx), keep("||"))),
-    ("and" + sfx, leftf("binary", r("cmp" + sfx), keep("&&"))),
-    ("cmp" + sfx, leftf("binary", r("bitor" + sfx), keeps(["==", "!=", "<=", ">=", "<", ">"]))),
-    ("bitor" + sfx, leftf("binary", r("bitxor" + sfx), keep("|"))),
-    ("bitxor" + sfx, leftf("binary", r("bitand" + sfx), keep("^"))),
-    ("bitand" + sfx, leftf("binary", r("shift" + sfx), keep("&"))),
+    // The binary levels are three ladders around the one level a ladder cannot
+    // hold: a shift's `>>` is two `>` tokens (the lexer has no `>>`, so that
+    // `Vec<Vec<T>>` closes), and a ladder level has to be one literal. `cmp`
+    // stays a rule of its own because a `let` chain's scrutinee stops there.
+    // Written as nine nested folds, reaching an operand cost a rule visit per
+    // level before the operand was even tried.
+    ("or" + sfx, prec("binary", r("cmp" + sfx), [keep("||"), keep("&&")])),
+    ("cmp" + sfx, prec("binary", r("shift" + sfx), [keeps(["==", "!=", "<=", ">=", "<", ">"]), keep("|"), keep("^"), keep("&")])),
     ("shift" + sfx, leftf("binary", r("sum" + sfx), alt([keep("<<"), seq([keep(">"), lit(">")])]))),
-    ("sum" + sfx, leftf("binary", r("product" + sfx), keeps(["+", "-"]))),
-    ("product" + sfx, leftf("binary", r("cast" + sfx), keeps(["*", "/", "%"]))),
+    ("sum" + sfx, prec("binary", r("cast" + sfx), [keeps(["+", "-"]), keeps(["*", "/", "%"])])),
     ("cast" + sfx, seq([r("unary" + sfx), rep(seq([lit("as"), r("type")]))])),
     ("unary" + sfx, alt([
        wrap("unary", seq([field("operator", keeps(["-", "!", "*"])), r("unary" + sfx)])),
