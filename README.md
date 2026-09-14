@@ -28,9 +28,10 @@ Every `.rs` file under `crates`, `tests`, `runtime`, `src` and `tools` of the
 
 The guarantee runs one way: a file this package rejects is broken for
 `rustfmt` too. Every `.rs` file in the compiler repository today — 1,022
-files, 17.3 MB — checks in **0.104 s** in one process, 166 MB/s, with the
+files, 17.3 MB — checks in **0.077 s** in one process, 225 MB/s, with the
 same four files rejected before and after the expression ladder below was
-folded ([evidence](docs/evidence/corpus-check-rust.json)); when this grammar
+folded and the engine's lexer packed
+([evidence](docs/evidence/corpus-check-rust-lexer.json)); when this grammar
 was written the same corpus took 2.4 s on one core, and the engine work
 recorded in [gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md)
 is the difference.
