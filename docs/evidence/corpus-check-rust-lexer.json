@@ -14,13 +14,13 @@
   "files": 1022,
   "bytes": 17297519,
   "processes": 1,
-  "seconds": 0.07681212504394352,
-  "megabytes_per_second": 225.19255898862642,
+  "seconds": 0.08041437494102865,
+  "megabytes_per_second": 215.10481195290046,
   "rejected_lines": 4,
   "largest": {
     "path": "crates/almide-codegen/src/generated/rust_runtime.rs",
     "lines": 53,
     "bytes": 556200,
-    "milliseconds": 4.087083972990513
+    "milliseconds": 4.722332931123674
   }
 }

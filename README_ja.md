@@ -25,7 +25,7 @@ almide build cli/main.almd -o gramide_rust     # .rs だけの gramide
 | `rustfmt` が拒否する 1 ファイル | パースは通る — 予約された edition で `gen` を名前に使っており、構文ではなく名前解決の問題 |
 
 保証は一方向です。このパッケージが拒否するファイルは `rustfmt` にとっても壊れている。今日の
-コンパイラリポジトリの全 `.rs` — 1,022 ファイル、17.3 MB — は 1 プロセス **0.077 秒**、225 MB/s で
+コンパイラリポジトリの全 `.rs` — 1,022 ファイル、17.3 MB — は 1 プロセス **0.080 秒**、215 MB/s で
 検査でき、下記の式の梯子を畳み、エンジンの字句解析器を pack した前後で拒否する 4 ファイルは同じです
 （[証拠](docs/evidence/corpus-check-rust-lexer.json)）。この文法を書いた時点では同じコーパスが 1 コア
 2.4 秒で、[gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md) に記録された

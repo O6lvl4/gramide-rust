@@ -28,7 +28,7 @@ Every `.rs` file under `crates`, `tests`, `runtime`, `src` and `tools` of the
 
 The guarantee runs one way: a file this package rejects is broken for
 `rustfmt` too. Every `.rs` file in the compiler repository today — 1,022
-files, 17.3 MB — checks in **0.077 s** in one process, 225 MB/s, with the
+files, 17.3 MB — checks in **0.080 s** in one process, 215 MB/s, with the
 same four files rejected before and after the expression ladder below was
 folded and the engine's lexer packed
 ([evidence](docs/evidence/corpus-check-rust-lexer.json)); when this grammar
