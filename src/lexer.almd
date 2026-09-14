@@ -1,0 +1,53 @@
+// lexer — how Rust is lexed: a `Spec` for the shared lexer in gramide.
+//
+// Everything about the language that a table can describe is here: keywords,
+// operators, comment markers, what a newline means, and the named families for
+// the two things a table cannot, how numbers are written and how strings end.
+import gramide.lex
+import gramide.tree
+
+// ── how Rust is lexed ─────────────────────────────────────────────────────
+
+let KEYWORDS = ["as", "async", "await", "break", "const", "continue", "crate", "dyn", "else", "enum",
+  "extern", "false", "fn", "for", "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut",
+  "pub", "ref", "return", "self", "Self", "static", "struct", "super", "trait", "true", "type",
+  "unsafe", "use", "where", "while", "macro_rules"]
+
+// `>>` is deliberately absent: it would close only one of the two brackets in
+// `Vec<Vec<T>>`, and a generic close is far more common in Rust than a shift.
+// The grammar spells a right shift as two `>` instead, and `>>=` as `>` `>=`.
+let OPERATORS = ["<<=", "...", "..=", "::", "->", "=>", "==", "!=", "<=", ">=", "&&", "||",
+  "+=", "-=", "*=", "/=", "%=", "^=", "&=", "|=", "<<", "..",
+  "+", "-", "*", "/", "%", "^", "!", "&", "|", "<", ">", "=", "@", ".", ",", ";", ":", "#", "$", "?",
+  "(", ")", "[", "]", "{", "}", "'"]
+
+fn spec() -> lex.Spec = lex.Spec {
+  keywords: KEYWORDS,
+  operators: OPERATORS,
+  numbers: lex.N_RUST,
+  strings: lex.S_RUST,
+  newlines: lex.NL_NONE,
+  ends_kw: [],
+  line_comment: [47, 47],                 // //
+  block_open: [47, 42],                   // /*
+  block_close: [42, 47],                  // */
+  nested_block: true,
+  block_comment_newline: false,
+  upper_is_type: false,
+  backtick_ident: false,
+  neg_token: false,
+}
+
+// ── lexing ────────────────────────────────────────────────────────────────
+
+test "raw strings end only at the hashes they opened with" {
+  let src = "let a = r#\"one \" two\"#; let b = b\"bytes\";"
+  let toks = lex.tokenize(src, spec())!
+  assert_eq(list.len(list.filter(toks, (t) => t.kind == tree.T_STRING)), 2)
+  assert_eq(list.get(lex.texts(bytes.from_string(src), toks), 3), some("r#\"one \" two\"#"))
+}
+
+test "numbers carry their type suffix, and `1.` is a float but `1.max` is not" {
+  assert_eq(lex.kinds(list.take(lex.tokenize("1u8 0xFFi64 2.0f32 1. 1.max(2)", spec())!, 5)),
+    ["integer", "integer", "float", "float", "integer"])
+}

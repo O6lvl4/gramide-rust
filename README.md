@@ -1,152 +1,77 @@
-# gramide
+# gramide-rust
 
-Syntax trees for coding agents, written in [Almide](https://github.com/almide/almide).
-`gramide` turns a source file into a tree an agent can ask questions of: does this
-file still parse, where does each declaration start and end, what is this node's
-name. A grammar is an ordinary value in the language, the parser interprets it, and
-there is no generator step and no native library between the agent and the tree.
+Rust for [gramide-cli](https://github.com/O6lvl4/gramide-cli): the lexer spec, the
+grammar as a value, that grammar compiled, and the rules that say which of its
+nodes declare a name — one Almide package, `gramide_rust`, depending on
+[gramide](https://github.com/O6lvl4/gramide) and on nothing else.
+The `gramide` command ([gramide-cli](https://github.com/O6lvl4/gramide-cli)) ships it; this repository is where it is tested, measured and
+released on its own.
 
 [日本語](README_ja.md)
 
 ```
-gramide check   src/main.almd     exit 0 if it parses, else `file:line:col: unexpected X (expected …)`
-gramide check   src/*.almd        any number of files: each grammar is compiled once, not once per file
-gramide outline src/main.almd     one line per declaration: `L12-40 function parse`, and a method
-                                  named with its type: `L82-89 method Applicability::as_str`
-                                  a file that does not parse still gets an outline of the parts that do
-gramide symbols src/main.almd     versioned JSON names, owners, line and byte ranges (strict parse)
-gramide parse   src/main.almd     the whole tree as an s-expression
-gramide tags    src/main.almd     `def function parse L40-58`, `ref call list.map L44`, `ref type Node L12` — a repo map's input
-gramide balance Widget.java       delimiters and literals only, for a language with no grammar here:
-                                  it cannot see a missing semicolon, and it cannot reject valid code
-gramide tokens  src/main.almd     the token stream, one per line
-gramide map . --budget 1024 --task "fix parse_rule"
-                                  a ranked map of the repository within the token budget:
-                                  the definitions other files use most, personalised toward
-                                  what the task mentions — what an agent reads before opening files
+almide build cli/main.almd -o gramide_rust     # gramide over .rs alone
+./gramide_rust check src/*.rs
+./gramide_rust outline src/lib.rs              # `L4-4 method S::fmt` under `L3-5 impl fmt::Display for S`
+./gramide_rust gen-table > src/table.almd      # after any change to the grammar
 ```
 
-## Why
+## What it covers
 
-An agent that edits code needs two things from a parser: a fast, honest answer to
-"did I just break the file", and a map of what is where so it can read only the part
-it needs. It does not need a full compiler front end, and it should not need a
-different native library for each language it touches. gramide is the smallest thing
-that gives an agent those two answers, in the same language the agent's tools are
-written in, so a grammar can be read, patched and tested like any other module.
-
-## Status
-
-Four language packages: Almide (`.almd`), Go (`.go`), Rust (`.rs`) and Python 3.14 (`.py`, `.pyi`). The Almide and Go
-reference-corpus results below found no rejection of a reference-valid file; this
-is evidence on those corpora, not a proof for every program. Rust is also covered
-by unit tests and the four-language CLI smoke check in [CI](ci/README.md).
-Acceptance does not establish full compiler syntax validity;
-the grammars are more permissive than the compilers in a few known places listed in
-[docs/design.md](docs/design.md).
-
-**Python** — declaration names, ownership and source ranges match CPython for 645 declarations, including 12 complete standard-library files. Functions, async functions, classes, decorators and type aliases are available to hew through `symbols`. `tags` and `map` read calls, base classes and annotations, and `ci/python_tags.py` lists what they deliberately do not read. Recovery, contextual compiler checks, literal decoding and Unicode normalization remain incomplete; see [package progress](docs/language-packages.md).
-
-**Almide** — every `.almd` file in the Almide repository (3,382 files after excluding
-two directories of deliberately non-Almide syntax experiments):
+Every `.rs` file under `crates`, `tests`, `runtime`, `src` and `tools` of the
+[Almide](https://github.com/almide/almide) compiler — 827 files, 15.7 MB:
 
 | files | result |
 |---|---|
-| 3,317 well-formed files | all parse |
-| 65 `broken.almd` diagnostic fixtures | all rejected, each also rejected by the compiler |
-| 720 other `broken.almd` fixtures | parse, and fail in the compiler at type checking as intended |
+| 826 files | all parse; `rustfmt --edition 2024` accepts exactly these 826 |
+| 1 file `rustfmt` rejects | parses — it uses `gen` as a name in an edition that reserves it, a name-resolution question, not a syntax one |
 
-**Go** — every `.go` file under `GOROOT/src` of Go 1.27 (8,077 files, standard
-library, compiler and toolchain, test data included):
+The guarantee runs one way: a file this package rejects is broken for
+`rustfmt` too. 15.7 MB parse in 2.4 s on one core, 6.6 MB/s, the same rate as
+the Go grammar. Against a tree-sitter binary, an outline of 120 Rust files and
+2.95 MB took 0.333 s to its 0.155 s with process startup subtracted, from
+0.73 s before the engine work recorded in
+[gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md).
 
-| files | result |
-|---|---|
-| 8,042 files | all parse |
-| 35 files, all under `testdata` | rejected, each also rejected by `gofmt -e` |
-| 11 `testdata` files `gofmt` rejects | parse (gramide is more permissive than `gofmt` here) |
+Structured ranges keep an item's envelope: `#[inline] pub fn read` starts at
+the attribute, and a method is named with the type it is implemented on —
+`S::fmt` under `impl fmt::Display for S`, whose trait and type are kept apart
+the way `rustc_ast::ast::Impl` keeps `of_trait` and `self_ty`, and qualified
+by its module path in flat output: `outer::inner::S::fmt`, while the outline
+shows the same nesting by indentation. A function written inside a method
+body is a function, not a method. Each of these is a test in
+`src/symbols.almd` and a fixture in `ci/symbols.py`.
 
-Whole-corpus `check`, one process per two thousand files (which is what the
-kernel's argument limit allows, and what `gramide check src/*.go` is): the 4,105
-`.almd` files in the Almide repository (everything but `.git`, `.claude`,
-`target` and `worktrees`) take **0.118 s** (42 MB/s), and every `.go` file under
-`GOROOT/src` — 7,702 files, 90.2 MB — takes **0.695 s** (130 MB/s). The largest,
-`cmd/compile/internal/ssa/opGen.go` at 96,689 generated lines, takes **64 ms**
-alone. `bench/corpus_check.py` measures it
-([Almide](docs/evidence/corpus-check-almide.json),
-[Go](docs/evidence/corpus-check-go.json)).
+## How it is written
 
-## How it works
+- **`src/lexer.almd`** — 34 lines of `Spec` and two lexer families of Rust's
+  own in the shared lexer: numbers with a type suffix (`1u8`, `2.0f32`, and
+  `1.` a float where `1.max` is not), and strings where `r##"…"##` closes
+  only on the hashes it opened with, `b"…"` is bytes, and `'a` is a lifetime
+  rather than an unterminated character — told apart by what closes them.
+  `NL_NONE`: newlines mean nothing, statements end at `;` or a block. `>>` is
+  deliberately absent from the operators, because it would close only one of
+  the two brackets in `Vec<Vec<T>>`; the grammar spells a shift as two `>`.
+- **`src/grammar.almd`** — items, types, patterns, expressions as a
+  precedence ladder, closures, let chains, qualified paths. The one
+  context-dependent place is the struct literal, exactly as in Go: `if x == T { }`
+  must not read `T { }` as a value, so the expression rules are generated
+  twice from one function and the headers of `if`, `while`, `for` and `match`
+  use the second. A macro body or an attribute's contents is a balanced run of
+  tokens with no reading. A `decl_head` rule keeps a half-typed item's name.
+- **`src/symbols.almd`** — functions, methods, trait method signatures,
+  types, lets, variants, fields, impls, mods and macros declare names; an
+  `impl` or a type owns its methods; a `mod` qualifies what is inside it;
+  `item_envelope` lends its start to the declaration it wraps.
+- **`src/table.almd`** — generated by `gen-table`; CI fails if it is stale.
 
-```
-source ──lexer──▶ tokens ──parser(grammar)──▶ tree ──▶ check / outline / parse
-```
+## Checks
 
-- **`src/lex.almd`** — a reusable lexer over bytes for the bundled languages. A language hands it a
-  `Spec`: keywords, operators, comment markers, what a newline means, and a named
-  family for the two things a table cannot describe, how numbers are written and how
-  string literals end. Go's lexing is 32 lines of that spec.
-- **`src/parser.almd`** — the engine. A grammar is a `Grammar { start, rules }` whose
-  rules are `Rule` values (`Tok`, `Lit`, `Seq`, `Alt`, `Rep`, `Opt`, `Wrap`, `Field`,
-  `Left`, lookahead). Ordered choice, greedy repetition, no left recursion: binary
-  operators are `Left(kind, operand, op)` and fold to the left after matching. The
-  parser remembers the farthest token anything failed at and what was expected there,
-  which is the error `check` prints.
-- **`src/packages/gramide_almide.almd`**, **`src/packages/gramide_go.almd`**, **`src/packages/gramide_rust.almd`** — a language each: its lexer spec
-  and its grammar, both as values, in one file. The Go one builds its expression ladder
-  twice from one function, with and without a trailing composite literal, which is how
-  `if x == T{…} {` is kept unambiguous.
-- **`src/packages/tables/`** — generated: each package's grammar already compiled,
-  written down as integers. Do not edit; `scripts/gen_grammar_tables.py` writes it.
-- **`src/tree.almd`** — `Node { kind, field, start, end, kids }` spanning token
-  indices, with `child(n, "name")`, `text_of`, `sexp`, and `collect`.
-- **`src/tags.almd`**, **`src/map.almd`** — definitions and references per file, and the
-  repository map: files referencing a name another file defines are edges, PageRank
-  personalised toward the task ranks the definitions, and the best are rendered file by
-  file until the budget is spent.
-
-A note on the engine: the grammar value is compiled into a flat arena of
-three-integer nodes and `parse_rule` is one self-recursive function with the loops
-for sequence, choice and repetition inside it. Both shapes come from how the Almide
-native backend copies values, and [docs/design.md](docs/design.md) records each rule
-with the measurement that forced it (one of them took a 116k-line generated Go
-file from 188 s to 7.6 s; the largest such file in Go 1.26 is 64 ms now).
-
-That arena is now compiled ahead of time. `python3 scripts/gen_grammar_tables.py`
-writes each package's into `src/packages/tables/`, and `--check` — which
-`ci/check.sh` runs — fails if what is committed is no longer what the grammar
-compiles to. The grammar value in `src/packages` stays the source of truth and
-stays the only thing anyone edits; the table is what a run reads, because
-compiling it took 0.8 ms of every run before the file was opened.
-
-## Build
-
-```
-almide build --release   # → ./gramide, the way `almide install` builds it
-almide test             # includes language-package contract tests
-```
-
-Requires Almide 0.61 or later.
+`bash ci/check.sh`: `almide test` (56 tests — lifetimes and characters, raw
+strings, suffixed numbers, every item kind, `>>`, `union`, closures, macro
+bodies, recovery, what the readers say), the table check, the binary's smoke
+test, and the structured-range fixtures ([ci/README.md](ci/README.md)).
 
 ## License
 
 MIT or Apache-2.0, at your option.
-
-The [structured symbol contract](docs/symbols.md) connects gramide to source readers
-such as hew, with independent range comparisons against the Go parser.
-
-## Language packages
-
-`gramide languages` returns versioned JSON describing registered packages, file
-extensions and capabilities. The bundled `gramide-almide`, `gramide-go` and
-`gramide-rust` modules each own their lexer factory, grammar and symbol rules.
-The host loads only packages needed for the requested files. A package may supply
-a custom lexer for indentation-sensitive syntax.
-
-These are statically composed modules in this repository; separate package
-installation and dynamic loading are not implemented. Python is not yet a
-registered language. See [the package contract and Python design checkpoint](docs/language-packages.md).
-
-Python editing support also exposes `gramide symbols-recovered file.py`. It
-returns only declarations disjoint from reported error ranges and explicitly
-marks recovered files incomplete; `symbols` stays strict. See the
-[reader contract](docs/language-packages.md#recovered-declaration-contract-for-readers).
