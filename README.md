@@ -52,18 +52,18 @@ a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.js
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| median | 48 µs | 53 µs |
-| 90th percentile | 67 µs | 75 µs |
+| median | 53 µs | 52 µs |
+| 90th percentile | 69 µs | 73 µs |
 | a whole parse, for scale | 1.7 ms | |
 
-Ahead at the median and at the tail. The tail was 383 µs before match
+Level at the median, ahead at the tail. The tail was 383 µs before match
 arms and impl members were items of their own, 219 µs before an edit in
 a doc comment, which touches no token, stopped reading the item before
 it, and 137 µs before a letter typed into a name, which retypes one
 token, stopped reading the item holding it.
 Over the compiler's 1,015 tracked `.rs` files, ten random edits each
 (10,000 edits, every one checked token for token and node for node against
-a whole parse of the same text) gave no difference; 13 edits were
+a whole parse of the same text) gave no difference; no edit was
 read as a whole file
 ([evidence](docs/evidence/incremental-corpus-almide-compiler-rs.json)).
 `ci/incremental_check.py` runs this; `reparse --edit START:OLD_END:NEW_END --new FILE`
