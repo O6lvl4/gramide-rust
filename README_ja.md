@@ -43,8 +43,8 @@ C ハーネスを `-DLANG=tree_sitter_rust` で組んだもの）にプロセス
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| 中央値 | 5.7 µs | 53 µs |
-| 90 パーセンタイル | 8.9 µs | 75 µs |
+| 中央値 | 5.5 µs | 53 µs |
+| 90 パーセンタイル | 7.7 µs | 74 µs |
 | 丸ごとのパース（目安） | 1.7 ms | |
 
 中央値で 9 倍速い。裾は match の腕と impl のメンバを item にする前は 383 µs、
