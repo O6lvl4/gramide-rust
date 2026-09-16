@@ -1,6 +1,6 @@
 {
   "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
-  "binary_sha256": "92280911433f6f149d45447d79cd5049a66ecd2338208476c9f7031d9a9fcf30",
+  "binary_sha256": "e833429b98cec0886981c2bbfd0829df07ae736dc9999c97ada62f8c06b97117",
   "root": "/Users/o6lvl4/workspace/github.com/almide/almide",
   "ext": [
     ".rs"
@@ -12,11 +12,11 @@
   "checked": 1000,
   "edits": 10000,
   "mismatches": 0,
-  "fallbacks": 17,
+  "fallbacks": 13,
   "fallback_reasons": {
     "no_lex": 0,
     "no_head": 0,
-    "no_parse": 17,
+    "no_parse": 13,
     "no_site": 0,
     "root_own": 0,
     "error_near": 0
