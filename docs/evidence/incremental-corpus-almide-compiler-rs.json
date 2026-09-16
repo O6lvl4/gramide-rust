@@ -1,0 +1,44 @@
+{
+  "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "db690d2bc7d18d4b45c1c781d6dd632c305669d4123f421b050ae82c47ea55be",
+  "root": "/Users/o6lvl4/workspace/github.com/almide/almide",
+  "ext": [
+    ".rs"
+  ],
+  "excluded": [],
+  "edits_per_file": 10,
+  "breaking": false,
+  "files": 1015,
+  "checked": 1000,
+  "edits": 10000,
+  "mismatches": 0,
+  "fallbacks": 18,
+  "fallback_reasons": {
+    "no_lex": 0,
+    "no_head": 0,
+    "no_parse": 18,
+    "no_site": 0,
+    "root_own": 0,
+    "error_near": 0
+  },
+  "skipped_no_long_word": [
+    "crates/almide-base/src/lib.rs",
+    "crates/almide-base/src/span.rs",
+    "crates/almide-codegen/src/annotations.rs",
+    "crates/almide-frontend/src/types.rs",
+    "crates/almide-interp/src/env.rs",
+    "crates/almide-kernel/src/simd_wasm.rs",
+    "crates/almide-optimize/src/lib.rs",
+    "crates/almide-syntax/src/lib.rs",
+    "crates/almide-syntax/src/parser/hints/delimiter.rs",
+    "crates/almide-syntax/src/parser/hints/keyword_typo.rs",
+    "crates/almide-tools/src/lib.rs",
+    "crates/almide-wasm/src/heap_cap.rs",
+    "research/benchmark/perf/rust-ref/strchurn_idiomatic.rs",
+    "runtime/rs/build.rs",
+    "tests/wasm_gc_test.rs"
+  ],
+  "errors": [],
+  "mismatched_files": [],
+  "reference_commit": "e706ba8c4e32eb39983bd125cec1890d17094300"
+}

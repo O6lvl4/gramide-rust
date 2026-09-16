@@ -1,0 +1,43 @@
+{
+ "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
+ "edits": 1000,
+ "seed": 7,
+ "verify_every": 50,
+ "gramide_sha256": "db690d2bc7d18d4b45c1c781d6dd632c305669d4123f421b050ae82c47ea55be",
+ "tree_sitter_harness_sha256": "9243c690fdb7fe9262edf6d4d4e2efae789c504803a932e0744fc25776ee8a3c",
+ "files": [
+  {
+   "path": "/Users/o6lvl4/workspace/github.com/almide/almide/crates/almide-frontend/src/lower/expressions.rs",
+   "bytes": 92095,
+   "gramide": {
+    "tool": "gramide",
+    "edits": 1000,
+    "median_us": 58.7,
+    "p90_us": 382.5,
+    "max_us": 1042.8,
+    "fallbacks": 0,
+    "mismatches": 0,
+    "initial_mismatch": false,
+    "fallback_reasons": {
+     "no_lex": 0,
+     "no_head": 0,
+     "no_parse": 0,
+     "no_site": 0,
+     "root_own": 0,
+     "error_near": 0
+    },
+    "whole_parse_samples": 20,
+    "whole_parse_median_us": 1604.3
+   },
+   "tree_sitter": {
+    "tool": "tree-sitter",
+    "edits": 1000,
+    "median_us": 52.0,
+    "p90_us": 72.0,
+    "max_us": 107.0,
+    "errors_at_end": 0,
+    "first_error_edit": -1
+   }
+  }
+ ]
+}
