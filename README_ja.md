@@ -32,21 +32,27 @@ almide build cli/main.almd -o gramide_rust     # .rs だけの gramide
 エンジンの仕事がその差です。
 
 キー入力 1 回は item 1 つを読み直すだけです。エンジンはパース済みのファイルを recover item
-（ここではモジュールの各 item と、ブロック内の各文）の入れ子として持ち、編集が触れた最小の item を
-読み直します（[仕組み](https://github.com/O6lvl4/gramide/blob/main/docs/incremental.md)）。
-`crates/almide-frontend/src/lower/expressions.rs`（92 KB）で、長い単語の 6 文字目に文字を打つ・消す
-編集 1,000 回の中央値は 65 µs、90 パーセンタイルは 415 µs で、丸ごとのパースは 1.7 ms。50 回に 1 回は
-丸ごとのパースと照合しています。コンパイラの追跡下 `.rs` 1,015 ファイルに各 10 回のランダム編集
-（10,000 回、毎回トークンとノードを丸ごとのパースと照合）で差はゼロ、18 回はファイル全体を読みました
+（ここではファイルやモジュール・trait・impl・extern ブロックの各 item、ブロック内の各文、`match` の各腕）の
+入れ子として持ち、編集が触れた最小の item を読み直します
+（[仕組み](https://github.com/O6lvl4/gramide/blob/main/docs/incremental.md)）。
+`crates/almide-frontend/src/lower/expressions.rs`（92 KB）に同じ 1,000 編集（13 文字以上の単語の 6 文字目に
+1 文字打つ・消す）を、gramide の `reparse-bench` と、tree-sitter-rust `77a3747` の `ts_tree_edit`＋再パース
+（[gramide-javascript](https://github.com/O6lvl4/gramide-javascript/blob/main/bench/tree_sitter_ranges.c) の
+C ハーネスを `-DLANG=tree_sitter_rust` で組んだもの）にプロセス内で与え、50 回に 1 回は丸ごとのパースと
+照合しました（[証拠](docs/evidence/incremental-rust-frontend-expressions.json)、`bench/incremental.py`）。
+
+| `lower/expressions.rs` | gramide | tree-sitter |
+|---|---:|---:|
+| 中央値 | 57 µs | 52 µs |
+| 90 パーセンタイル | 219 µs | 72 µs |
+| 丸ごとのパース（目安） | 1.6 ms | |
+
+中央値は同等、裾では負けています。裾の編集は item の間の doc コメントの中に落ちたもので、コメントは
+トークンではないので直前の item の byte に含まれ、その item を丸ごと読み直します。match の腕と impl の
+メンバを item にする前は裾が 383 µs でした。コンパイラの追跡下 `.rs` 1,015 ファイルに各 10 回のランダム編集
+（10,000 回、毎回トークンとノードを丸ごとのパースと照合）で差はゼロ、17 回はファイル全体を読みました
 （[証拠](docs/evidence/incremental-corpus-almide-compiler-rs.json)）。`ci/incremental_check.py` が
 これを回し、1 回の編集は `reparse --edit START:OLD_END:NEW_END --new FILE` です。
-同じ 1,000 編集を tree-sitter-rust `77a3747` の `ts_tree_edit`＋再パース
-（[gramide-javascript](https://github.com/O6lvl4/gramide-javascript/blob/main/bench/tree_sitter_ranges.c) の
-C ハーネスを `-DLANG=tree_sitter_rust` で組んだもの）に与えると中央値 52 µs、90 パーセンタイル 72 µs で、
-gramide の 59 と 383 に対してこちらは tree-sitter が速い
-（[証拠](docs/evidence/incremental-rust-frontend-expressions.json)、`bench/incremental.py`）。
-大きな `match` を持つ文は gramide には item 1 つで丸ごと読み直しになり、tree-sitter は編集が触れなかった
-腕を使い回すためです。
 
 構造化範囲は item のエンベロープを保ちます。`#[inline] pub fn read` は属性から始まり、
 メソッドは実装先の型で名付けられます — `impl fmt::Display for S` の下の `S::fmt`。trait と型は

@@ -18,7 +18,7 @@ import gramide.names as nametable
 import gramide.tree
 import gramide.parser
 import gramide.lex
-import gramide.parser.{ tok, lit, keep, r, seq, alt, rep, rep1, opt, wrap, field, ahead, nott, leftf, prec, lits, keeps, any, grammar, recover, recover_all_keeping }
+import gramide.parser.{ tok, lit, keep, r, seq, alt, rep, rep1, opt, wrap, field, ahead, nott, leftf, prec, lits, keeps, any, grammar, recover, recover_keeping, recover_all_keeping }
 import self.lexer
 
 // ── the grammar ───────────────────────────────────────────────────────────
@@ -138,7 +138,7 @@ fn rules() -> parser.Grammar = grammar("source_file", tt_rules() + expr_rules(""
   ("use_path", seq([opt(lit("::")), rep(seq([alt([ident, lit("crate"), lit("self"), lit("super")]), lit("::")]))])),
 
   ("mod_decl", wrap("mod", seq([lit("mod"), field("name", ident),
-     alt([lit(";"), seq([lit("{"), rep(r("inner_attr")), rep(r("item")), lit("}")])])]))),
+     alt([lit(";"), seq([lit("{"), rep(r("inner_attr")), rep(recover_keeping(r("item"), r("decl_head"))), lit("}")])])]))),
 
   ("fn_decl", wrap("function_declaration", seq([
      rep(lits(["const", "async", "unsafe"])), opt(seq([lit("extern"), opt(tok("string"))])),
@@ -178,7 +178,7 @@ fn rules() -> parser.Grammar = grammar("source_file", tt_rules() + expr_rules(""
 
   ("trait_decl", wrap("type_declaration", seq([opt(lit("unsafe")), lit("trait"), wrap("type_spec", seq([
      field("name", ident), opt(r("generic_params")), opt(seq([lit(":"), r("bounds")])), opt(r("where")),
-     lit("{"), rep(r("inner_attr")), rep(r("assoc_item")), lit("}")]))]))),
+     lit("{"), rep(r("inner_attr")), rep(recover_keeping(r("assoc_item"), r("decl_head"))), lit("}")]))]))),
 
   // `name` is always the type being implemented, so the methods inside can be
   // qualified by it: in `impl Display for S` that is S, not Display. The trait
@@ -190,7 +190,10 @@ fn rules() -> parser.Grammar = grammar("source_file", tt_rules() + expr_rules(""
      alt([seq([field("trait", r("type")), lit("for"), field("name", r("type"))]),
           field("name", r("type"))]),
      opt(r("where")),
-     lit("{"), rep(r("inner_attr")), rep(r("assoc_item")), lit("}")]))),
+     lit("{"), rep(r("inner_attr")), rep(recover_keeping(r("assoc_item"), r("decl_head"))), lit("}")]))),
+  // the members of a module, trait, impl or extern block are recover items
+  // like the file's: a broken one is given up alone, and an edit inside one
+  // re-reads it, not the block
   ("assoc_item", wrap("item_envelope", seq([rep(r("attr")), r("visibility"), alt([
      r("fn_decl"), r("type_alias"), r("const_decl"), r("macro_item")])]))),
 
@@ -203,7 +206,7 @@ fn rules() -> parser.Grammar = grammar("source_file", tt_rules() + expr_rules(""
      opt(seq([lit("="), field("value", r("expr"))])), lit(";")]))),
 
   ("extern_block", wrap("extern", seq([opt(lit("unsafe")), lit("extern"), opt(tok("string")),
-     lit("{"), rep(r("inner_attr")), rep(r("item")), lit("}")]))),
+     lit("{"), rep(r("inner_attr")), rep(recover_keeping(r("item"), r("decl_head"))), lit("}")]))),
 
   ("macro_def", wrap("macro_definition", seq([lit("macro_rules"), lit("!"), field("name", ident), r("tt_group")]))),
   ("macro_item", wrap("macro", seq([field("name", r("path")), lit("!"), opt(ident), r("tt_group"), opt(lit(";"))]))),
@@ -301,8 +304,10 @@ fn rules() -> parser.Grammar = grammar("source_file", tt_rules() + expr_rules(""
   // The right side of a `let` binds tighter than `&&`, so it stops below it.
   ("cond", seq([r("cond_one"), rep(seq([lit("&&"), r("cond_one")]))])),
   ("cond_one", alt([seq([lit("let"), r("pattern"), lit("="), r("cmp_nc")]), r("expr_nc")])),
+  // each arm is a recover item: a broken arm is given up alone, and an edit
+  // inside one re-reads that arm, not the statement holding the `match`
   ("match", wrap("match", seq([lit("match"), field("condition", r("expr_nc")), lit("{"),
-     rep(r("match_arm")), lit("}")]))),
+     rep(recover(r("match_arm"))), lit("}")]))),
   ("match_arm", wrap("match_arm", seq([rep(r("attr")), r("pattern"),
      opt(seq([lit("if"), r("expr")])), lit("=>"),
      alt([seq([r("block_expr"), nott(lits([".", "?"])), opt(lit(","))]), seq([r("expr"), opt(lit(","))])])]))),
@@ -395,4 +400,15 @@ test "a lifetime and a character are told apart by what closes them" {
   assert_eq(list.len(list.filter(toks, (t) => t.kind == tree.T_RUNE)), 1)
   // and a list of lifetimes does not swallow the comma between them
   assert_eq(top_kinds("struct S<'a, 'b> { x: &'a str, y: &'b str }"), ["type_declaration"])
+}
+
+test "a broken match arm, or a broken method, is given up alone" {
+  // the arm `Some(x) =>` has no body: the match, the function and the items after it stay readable
+  let src = "fn alpha(v: Option<u8>) -> u8 {\n  match v {\n    Some(x) =>\n    None => 0,\n  }\n}\n\nfn beta() -> u8 { 2 }\n"
+  match parse_src(src) { ok(_) => assert(false), err(_) => () }
+  assert_eq(recovered_kinds(src), ["function_declaration", "function_declaration"])
+  // a method with a half-typed signature keeps its name and its neighbours
+  let members = "impl S {\n  fn one(&self) -> u8 { 1 }\n  fn two(&self, x: u8\n  fn three(&self) -> u8 { 3 }\n}\n"
+  match parse_src(members) { ok(_) => assert(false), err(_) => () }
+  assert_eq(recovered_kinds(members), ["impl"])
 }

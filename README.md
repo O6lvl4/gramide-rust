@@ -37,28 +37,36 @@ recorded in [gramide](https://github.com/O6lvl4/gramide/blob/main/docs/design.md
 is the difference.
 
 One keystroke re-reads one item: the engine keeps a parsed file as its
-recover items (here, every item of a module and every statement inside a
-block) and re-reads the smallest one an edit touched
+recover items (here, every item of the file or of a module, trait, impl or
+extern block, every statement inside a block, and every arm of a `match`)
+and re-reads the smallest one an edit touched
 ([how](https://github.com/O6lvl4/gramide/blob/main/docs/incremental.md)).
-On `crates/almide-frontend/src/lower/expressions.rs` (92 KB), 1,000 letters
-typed or deleted six letters into long words cost 65 µs at the median and
-415 µs at the 90th percentile, against 1.7 ms for a whole parse, every
-fiftieth checked against one. Over the compiler's 1,015 tracked `.rs` files,
-ten random edits each (10,000 edits, every one checked token for token and
-node for node against a whole parse of the same text) gave no difference;
-18 edits were read as a whole file
+The same 1,000 edits on `crates/almide-frontend/src/lower/expressions.rs`
+(92 KB), each a letter typed or deleted six letters into a word of thirteen
+or more, in-process, for gramide's `reparse-bench` and for tree-sitter-rust
+at `77a3747` through `ts_tree_edit` + reparse in the C harness of
+[gramide-javascript](https://github.com/O6lvl4/gramide-javascript/blob/main/bench/tree_sitter_ranges.c)
+built with `-DLANG=tree_sitter_rust`; every fiftieth result checked against
+a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.json),
+`bench/incremental.py`):
+
+| `lower/expressions.rs` | gramide | tree-sitter |
+|---|---:|---:|
+| median | 57 µs | 52 µs |
+| 90th percentile | 219 µs | 72 µs |
+| a whole parse, for scale | 1.6 ms | |
+
+Level at the median; behind at the tail, where the edits fall in the doc
+comments between items — a comment is no token, so such an edit lies in
+the bytes of the item before it and that item is read again whole. Before
+match arms and impl members were items of their own the tail was 383 µs.
+Over the compiler's 1,015 tracked `.rs` files, ten random edits each
+(10,000 edits, every one checked token for token and node for node against
+a whole parse of the same text) gave no difference; 17 edits were
+read as a whole file
 ([evidence](docs/evidence/incremental-corpus-almide-compiler-rs.json)).
 `ci/incremental_check.py` runs this; `reparse --edit START:OLD_END:NEW_END --new FILE`
 is the one-edit command.
-The same 1,000 edits through tree-sitter-rust at `77a3747` (`ts_tree_edit` +
-reparse, the C harness of
-[gramide-javascript](https://github.com/O6lvl4/gramide-javascript/blob/main/bench/tree_sitter_ranges.c)
-built with `-DLANG=tree_sitter_rust`) take 52 µs at the median and 72 µs at
-the 90th percentile against gramide's 59 and 383
-([evidence](docs/evidence/incremental-rust-frontend-expressions.json),
-`bench/incremental.py`): here tree-sitter is ahead, because a statement
-holding a large `match` is one item to gramide and is read again whole,
-where tree-sitter reuses the arms the edit did not touch.
 
 Structured ranges keep an item's envelope: `#[inline] pub fn read` starts at
 the attribute, and a method is named with the type it is implemented on —
