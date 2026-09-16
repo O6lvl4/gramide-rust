@@ -52,15 +52,16 @@ a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.js
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| median | 53 µs | 52 µs |
-| 90th percentile | 69 µs | 73 µs |
+| median | 5.7 µs | 53 µs |
+| 90th percentile | 8.9 µs | 75 µs |
 | a whole parse, for scale | 1.7 ms | |
 
-Level at the median, ahead at the tail. The tail was 383 µs before match
-arms and impl members were items of their own, 219 µs before an edit in
-a doc comment, which touches no token, stopped reading the item before
-it, and 137 µs before a letter typed into a name, which retypes one
-token, stopped reading the item holding it.
+Nine times ahead at the median. The tail was 383 µs before match arms and
+impl members were items of their own, 219 µs before an edit in a doc
+comment, which touches no token, stopped reading the item before it, and
+137 µs before a letter typed into a name, which retypes one token,
+stopped reading the item holding it; the median was 53 µs until the
+engine stopped cloning its grammar table on the way to the edit.
 Over the compiler's 1,015 tracked `.rs` files, ten random edits each
 (10,000 edits, every one checked token for token and node for node against
 a whole parse of the same text) gave no difference; no edit was
