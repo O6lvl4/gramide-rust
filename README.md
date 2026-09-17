@@ -52,8 +52,8 @@ a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.js
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| median | 5.3 µs | 53 µs |
-| 90th percentile | 7.5 µs | 74 µs |
+| median | 6.2 µs | 56 µs |
+| 90th percentile | 10 µs | 77 µs |
 | a whole parse, for scale | 1.7 ms | |
 
 Nine times ahead at the median. The tail was 383 µs before match arms and
@@ -95,7 +95,7 @@ appears ([evidence](docs/evidence/recovery-almide-compiler-rs.json), [how it rec
 | declarations kept, all breaks | 99.9% | 97.5% |
 | clean breaks (nothing lost beyond the break, nothing invented) | 99.8% | 94.9% |
 | clean breaks, `insert {` | 99.8% | 97.1% |
-| clean breaks, `delete }` | 99.4% | 94.5% |
+| clean breaks, `delete }` | 99.5% | 94.5% |
 | clean breaks, `delete )` | 100.0% | 92.7% |
 | clean breaks, `insert (` | 100.0% | 95.2% |
 

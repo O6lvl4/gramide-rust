@@ -18,58 +18,58 @@
   "total": {
    "breaks": 2632,
    "baseline": 37802,
-   "kept": 37765,
-   "lost_touching": 20,
-   "lost_collateral": 17,
+   "kept": 37775,
+   "lost_touching": 11,
+   "lost_collateral": 16,
    "spurious": 0,
-   "clean_breaks": 2627,
+   "clean_breaks": 2628,
    "no_error_reported": 2632,
-   "error_nodes": 2709
+   "error_nodes": 1693
   },
   "by_break": [
    {
     "breaks": 663,
     "baseline": 9451,
-    "kept": 9440,
-    "lost_touching": 6,
+    "kept": 9441,
+    "lost_touching": 5,
     "lost_collateral": 5,
     "spurious": 0,
     "clean_breaks": 662,
     "no_error_reported": 663,
-    "error_nodes": 667
+    "error_nodes": 621
    },
    {
     "breaks": 651,
     "baseline": 9450,
-    "kept": 9435,
-    "lost_touching": 3,
-    "lost_collateral": 12,
+    "kept": 9437,
+    "lost_touching": 2,
+    "lost_collateral": 11,
     "spurious": 0,
-    "clean_breaks": 647,
+    "clean_breaks": 648,
     "no_error_reported": 651,
-    "error_nodes": 950
+    "error_nodes": 646
    },
    {
     "breaks": 655,
     "baseline": 9450,
-    "kept": 9446,
-    "lost_touching": 4,
+    "kept": 9450,
+    "lost_touching": 0,
     "lost_collateral": 0,
     "spurious": 0,
     "clean_breaks": 655,
     "no_error_reported": 655,
-    "error_nodes": 667
+    "error_nodes": 173
    },
    {
     "breaks": 663,
     "baseline": 9451,
-    "kept": 9444,
-    "lost_touching": 7,
+    "kept": 9447,
+    "lost_touching": 4,
     "lost_collateral": 0,
     "spurious": 0,
     "clean_breaks": 663,
     "no_error_reported": 663,
-    "error_nodes": 425
+    "error_nodes": 253
    }
   ],
   "worst": [
@@ -104,14 +104,6 @@
     "delete }",
     18478,
     393
-   ],
-   [
-    1,
-    0,
-    "almide-codegen/src/pass_fan_lowering.rs",
-    "delete }",
-    2692,
-    51
    ],
    [
     0,
@@ -152,6 +144,14 @@
     "insert {",
     245,
     4
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_call_boundary.rs",
+    "insert (",
+    1264,
+    42
    ]
   ]
  },
@@ -297,7 +297,7 @@
   ]
  },
  "both_lost_collateral": 2,
- "only_gramide_lost_collateral": 3,
+ "only_gramide_lost_collateral": 2,
  "only_tree_sitter_lost_collateral": 133,
- "seconds": 27.8
+ "seconds": 32.6
 }
