@@ -1,0 +1,303 @@
+{
+ "root": "/Users/o6lvl4/workspace/github.com/almide/almide/crates",
+ "kinds": [
+  "function",
+  "type"
+ ],
+ "files": 663,
+ "skipped_not_clean": 0,
+ "breaks_per_file": 4,
+ "seed": 7,
+ "break_kinds": [
+  "insert {",
+  "delete }",
+  "delete )",
+  "insert ("
+ ],
+ "gramide": {
+  "total": {
+   "breaks": 2632,
+   "baseline": 37802,
+   "kept": 37765,
+   "lost_touching": 20,
+   "lost_collateral": 17,
+   "spurious": 0,
+   "clean_breaks": 2627,
+   "no_error_reported": 2632,
+   "error_nodes": 2709
+  },
+  "by_break": [
+   {
+    "breaks": 663,
+    "baseline": 9451,
+    "kept": 9440,
+    "lost_touching": 6,
+    "lost_collateral": 5,
+    "spurious": 0,
+    "clean_breaks": 662,
+    "no_error_reported": 663,
+    "error_nodes": 667
+   },
+   {
+    "breaks": 651,
+    "baseline": 9450,
+    "kept": 9435,
+    "lost_touching": 3,
+    "lost_collateral": 12,
+    "spurious": 0,
+    "clean_breaks": 647,
+    "no_error_reported": 651,
+    "error_nodes": 950
+   },
+   {
+    "breaks": 655,
+    "baseline": 9450,
+    "kept": 9446,
+    "lost_touching": 4,
+    "lost_collateral": 0,
+    "spurious": 0,
+    "clean_breaks": 655,
+    "no_error_reported": 655,
+    "error_nodes": 667
+   },
+   {
+    "breaks": 663,
+    "baseline": 9451,
+    "kept": 9444,
+    "lost_touching": 7,
+    "lost_collateral": 0,
+    "spurious": 0,
+    "clean_breaks": 663,
+    "no_error_reported": 663,
+    "error_nodes": 425
+   }
+  ],
+  "worst": [
+   [
+    8,
+    0,
+    "almide-base/src/profile.rs",
+    "delete }",
+    4401,
+    108
+   ],
+   [
+    5,
+    0,
+    "almide-wasm/src/heap_cap.rs",
+    "insert {",
+    937,
+    16
+   ],
+   [
+    2,
+    0,
+    "almide-wasm/src/exit_plan.rs",
+    "delete }",
+    7535,
+    159
+   ],
+   [
+    1,
+    0,
+    "almide-interp/src/dispatch.rs",
+    "delete }",
+    18478,
+    393
+   ],
+   [
+    1,
+    0,
+    "almide-codegen/src/pass_fan_lowering.rs",
+    "delete }",
+    2692,
+    51
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_floor.rs",
+    "insert {",
+    4491,
+    89
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_floor.rs",
+    "insert (",
+    1544,
+    25
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_floor.rs",
+    "delete }",
+    4805,
+    98
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_floor.rs",
+    "delete )",
+    5513,
+    122
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_call_boundary.rs",
+    "insert {",
+    245,
+    4
+   ]
+  ]
+ },
+ "tree_sitter": {
+  "total": {
+   "breaks": 2632,
+   "baseline": 37660,
+   "kept": 36711,
+   "lost_touching": 360,
+   "lost_collateral": 589,
+   "spurious": 0,
+   "clean_breaks": 2497,
+   "no_error_reported": 939,
+   "error_nodes": 5502
+  },
+  "by_break": [
+   {
+    "breaks": 663,
+    "baseline": 9415,
+    "kept": 9278,
+    "lost_touching": 60,
+    "lost_collateral": 77,
+    "spurious": 0,
+    "clean_breaks": 644,
+    "no_error_reported": 336,
+    "error_nodes": 911
+   },
+   {
+    "breaks": 651,
+    "baseline": 9415,
+    "kept": 9088,
+    "lost_touching": 207,
+    "lost_collateral": 120,
+    "spurious": 0,
+    "clean_breaks": 615,
+    "no_error_reported": 121,
+    "error_nodes": 1717
+   },
+   {
+    "breaks": 655,
+    "baseline": 9415,
+    "kept": 9102,
+    "lost_touching": 58,
+    "lost_collateral": 255,
+    "spurious": 0,
+    "clean_breaks": 607,
+    "no_error_reported": 156,
+    "error_nodes": 1595
+   },
+   {
+    "breaks": 663,
+    "baseline": 9415,
+    "kept": 9243,
+    "lost_touching": 35,
+    "lost_collateral": 137,
+    "spurious": 0,
+    "clean_breaks": 631,
+    "no_error_reported": 326,
+    "error_nodes": 1279
+   }
+  ],
+  "worst": [
+   [
+    26,
+    0,
+    "almide-syntax/src/parser/test_expr_precedence.rs",
+    "delete )",
+    6161,
+    183
+   ],
+   [
+    25,
+    0,
+    "almide-mir/src/certificate_p2.rs",
+    "delete )",
+    7750,
+    163
+   ],
+   [
+    19,
+    0,
+    "almide-mir/src/render_wasm/tests_part3_c.rs",
+    "delete )",
+    17284,
+    323
+   ],
+   [
+    18,
+    0,
+    "almide-egg-lab/src/lib.rs",
+    "insert (",
+    9123,
+    203
+   ],
+   [
+    17,
+    0,
+    "almide-mir/src/lower/tests_part1_b.rs",
+    "delete )",
+    2796,
+    64
+   ],
+   [
+    17,
+    0,
+    "almide-mir/src/lower/mod_p3.rs",
+    "insert (",
+    2774,
+    45
+   ],
+   [
+    16,
+    0,
+    "almide-codegen/src/pass_stream_fusion.rs",
+    "delete }",
+    14371,
+    319
+   ],
+   [
+    15,
+    0,
+    "almide-wasm-run/src/wasi_p3.rs",
+    "insert {",
+    11788,
+    207
+   ],
+   [
+    15,
+    0,
+    "almide-mir/src/lower/mod_b.rs",
+    "delete )",
+    11594,
+    248
+   ],
+   [
+    14,
+    0,
+    "almide-mir/src/lower/tests_part1.rs",
+    "delete )",
+    3081,
+    72
+   ]
+  ]
+ },
+ "both_lost_collateral": 2,
+ "only_gramide_lost_collateral": 3,
+ "only_tree_sitter_lost_collateral": 133,
+ "seconds": 27.8
+}

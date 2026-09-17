@@ -52,8 +52,8 @@ a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.js
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| median | 5.5 µs | 53 µs |
-| 90th percentile | 7.7 µs | 74 µs |
+| median | 5.3 µs | 53 µs |
+| 90th percentile | 7.5 µs | 74 µs |
 | a whole parse, for scale | 1.7 ms | |
 
 Nine times ahead at the median. The tail was 383 µs before match arms and
@@ -78,6 +78,30 @@ by its module path in flat output: `outer::inner::S::fmt`, while the outline
 shows the same nesting by indentation. A function written inside a method
 body is a function, not a method. Each of these is a test in
 `src/symbols.almd` and a fixture in `ci/symbols.py`.
+
+### A broken file
+
+An editor's file is broken more often than not. `bench/recovery.py` breaks every
+file of the corpus in four ways, one at a time — a `{` typed at the start of a
+word, a `}` deleted, a `)` deleted, a `(` typed — and compares what each tool
+still lists (gramide's `outline`, which reads the recovered parse; tree-sitter's
+tree through the same harness, `--recover`) with its own listing of the whole
+file, by kind, name and start line. A declaration whose lines hold the break is
+expected to go; a break is *clean* when nothing else is lost and nothing new
+appears ([evidence](docs/evidence/recovery-almide-compiler-rs.json), [how it recovers](https://github.com/O6lvl4/gramide/blob/main/docs/recovery.md)):
+
+| Almide compiler `crates/`: 663 files, 2,632 breaks | gramide | tree-sitter |
+|---|---:|---:|
+| declarations kept, all breaks | 99.9% | 97.5% |
+| clean breaks (nothing lost beyond the break, nothing invented) | 99.8% | 94.9% |
+| clean breaks, `insert {` | 99.8% | 97.1% |
+| clean breaks, `delete }` | 99.4% | 94.5% |
+| clean breaks, `delete )` | 100.0% | 92.7% |
+| clean breaks, `insert (` | 100.0% | 95.2% |
+
+gramide is ahead on every kind of break. A `}` deleted resumes at the next
+`fn` or item, where tree-sitter nests what follows into the open body; a `)`
+deleted costs gramide nothing beyond the item that holds it.
 
 ## How it is written
 
