@@ -24,7 +24,7 @@
    "spurious": 0,
    "clean_breaks": 2628,
    "no_error_reported": 2632,
-   "error_nodes": 1693
+   "error_nodes": 1698
   },
   "by_break": [
    {
@@ -36,7 +36,7 @@
     "spurious": 0,
     "clean_breaks": 662,
     "no_error_reported": 663,
-    "error_nodes": 621
+    "error_nodes": 624
    },
    {
     "breaks": 651,
@@ -58,7 +58,7 @@
     "spurious": 0,
     "clean_breaks": 655,
     "no_error_reported": 655,
-    "error_nodes": 173
+    "error_nodes": 175
    },
    {
     "breaks": 663,
@@ -299,5 +299,5 @@
  "both_lost_collateral": 2,
  "only_gramide_lost_collateral": 2,
  "only_tree_sitter_lost_collateral": 133,
- "seconds": 32.6
+ "seconds": 30.8
 }

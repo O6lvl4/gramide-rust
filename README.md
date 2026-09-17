@@ -52,8 +52,8 @@ a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.js
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| median | 6.2 µs | 56 µs |
-| 90th percentile | 10 µs | 77 µs |
+| median | 5.4 µs | 54 µs |
+| 90th percentile | 7.5 µs | 73 µs |
 | a whole parse, for scale | 1.7 ms | |
 
 Nine times ahead at the median. The tail was 383 µs before match arms and

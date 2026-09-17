@@ -36,7 +36,9 @@ fn tt_rules() -> List[(String, parser.Rule)] = [
      seq([lit("("), rep(r("tt")), lit(")")]),
      seq([lit("["), rep(r("tt")), lit("]")]),
      seq([lit("{"), rep(r("tt")), lit("}")]),
-     seq([nott(lits([")", "]", "}"])), any()])])),
+     // an opener is only ever the group it opens: read also as a lone token,
+     // a bracket left unclosed forks the read at every opener after it
+     seq([nott(lits([")", "]", "}", "(", "[", "{"])), any()])])),
   ("tt_group", alt([
      seq([lit("("), rep(r("tt")), lit(")")]),
      seq([lit("["), rep(r("tt")), lit("]")]),
