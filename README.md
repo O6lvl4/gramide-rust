@@ -52,11 +52,11 @@ a whole parse ([evidence](docs/evidence/incremental-rust-frontend-expressions.js
 
 | `lower/expressions.rs` | gramide | tree-sitter |
 |---|---:|---:|
-| median | 5.4 µs | 54 µs |
-| 90th percentile | 7.5 µs | 73 µs |
-| a whole parse, for scale | 1.7 ms | |
+| median | 4.6 µs | 53 µs |
+| 90th percentile | 6.2 µs | 75 µs |
+| a whole parse, for scale | 1.6 ms | |
 
-Nine times ahead at the median. The tail was 383 µs before match arms and
+Eleven times ahead at the median. The tail was 383 µs before match arms and
 impl members were items of their own, 219 µs before an edit in a doc
 comment, which touches no token, stopped reading the item before it, and
 137 µs before a letter typed into a name, which retypes one token,

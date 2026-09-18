@@ -299,5 +299,5 @@
  "both_lost_collateral": 0,
  "only_gramide_lost_collateral": 1,
  "only_tree_sitter_lost_collateral": 135,
- "seconds": 45.2
+ "seconds": 40.0
 }
