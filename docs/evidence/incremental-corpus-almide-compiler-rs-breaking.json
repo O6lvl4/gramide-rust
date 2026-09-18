@@ -1,6 +1,6 @@
 {
   "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
-  "binary_sha256": "cec6d414d52c12613091fde8effbb84b983d7793e845bf99e7eb78ceeb2b1e0f",
+  "binary_sha256": "43a833ccb7d04d9a844a84473f4798f6e018bdf879dd3587cbddcefda67d84a6",
   "root": "/Users/o6lvl4/workspace/github.com/almide/almide",
   "ext": [
     ".rs"

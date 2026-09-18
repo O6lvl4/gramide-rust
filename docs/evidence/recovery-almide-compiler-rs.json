@@ -18,36 +18,36 @@
   "total": {
    "breaks": 2632,
    "baseline": 37802,
-   "kept": 37775,
-   "lost_touching": 11,
-   "lost_collateral": 16,
+   "kept": 37785,
+   "lost_touching": 15,
+   "lost_collateral": 2,
    "spurious": 0,
-   "clean_breaks": 2628,
+   "clean_breaks": 2631,
    "no_error_reported": 2632,
-   "error_nodes": 1698
+   "error_nodes": 1001
   },
   "by_break": [
    {
     "breaks": 663,
     "baseline": 9451,
-    "kept": 9441,
-    "lost_touching": 5,
-    "lost_collateral": 5,
+    "kept": 9444,
+    "lost_touching": 7,
+    "lost_collateral": 0,
     "spurious": 0,
-    "clean_breaks": 662,
+    "clean_breaks": 663,
     "no_error_reported": 663,
-    "error_nodes": 624
+    "error_nodes": 505
    },
    {
     "breaks": 651,
     "baseline": 9450,
-    "kept": 9437,
-    "lost_touching": 2,
-    "lost_collateral": 11,
+    "kept": 9450,
+    "lost_touching": 0,
+    "lost_collateral": 0,
     "spurious": 0,
-    "clean_breaks": 648,
+    "clean_breaks": 651,
     "no_error_reported": 651,
-    "error_nodes": 646
+    "error_nodes": 186
    },
    {
     "breaks": 655,
@@ -58,52 +58,28 @@
     "spurious": 0,
     "clean_breaks": 655,
     "no_error_reported": 655,
-    "error_nodes": 175
+    "error_nodes": 75
    },
    {
     "breaks": 663,
     "baseline": 9451,
-    "kept": 9447,
-    "lost_touching": 4,
-    "lost_collateral": 0,
+    "kept": 9441,
+    "lost_touching": 8,
+    "lost_collateral": 2,
     "spurious": 0,
-    "clean_breaks": 663,
+    "clean_breaks": 662,
     "no_error_reported": 663,
-    "error_nodes": 253
+    "error_nodes": 235
    }
   ],
   "worst": [
    [
-    8,
-    0,
-    "almide-base/src/profile.rs",
-    "delete }",
-    4401,
-    108
-   ],
-   [
-    5,
-    0,
-    "almide-wasm/src/heap_cap.rs",
-    "insert {",
-    937,
-    16
-   ],
-   [
     2,
     0,
-    "almide-wasm/src/exit_plan.rs",
-    "delete }",
-    7535,
-    159
-   ],
-   [
-    1,
-    0,
-    "almide-interp/src/dispatch.rs",
-    "delete }",
-    18478,
-    393
+    "almide-mir/src/lower/mod_p4.rs",
+    "insert (",
+    8730,
+    220
    ],
    [
     0,
@@ -152,6 +128,30 @@
     "insert (",
     1264,
     42
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_call_boundary.rs",
+    "delete }",
+    2136,
+    62
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/witness_call_boundary.rs",
+    "delete )",
+    848,
+    21
+   ],
+   [
+    0,
+    0,
+    "almide-wasm/tests/wasi_services.rs",
+    "insert {",
+    3170,
+    89
    ]
   ]
  },
@@ -296,8 +296,8 @@
    ]
   ]
  },
- "both_lost_collateral": 2,
- "only_gramide_lost_collateral": 2,
- "only_tree_sitter_lost_collateral": 133,
- "seconds": 30.8
+ "both_lost_collateral": 0,
+ "only_gramide_lost_collateral": 1,
+ "only_tree_sitter_lost_collateral": 135,
+ "seconds": 45.2
 }

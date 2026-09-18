@@ -92,16 +92,17 @@ appears ([evidence](docs/evidence/recovery-almide-compiler-rs.json), [how it rec
 
 | Almide compiler `crates/`: 663 files, 2,632 breaks | gramide | tree-sitter |
 |---|---:|---:|
-| declarations kept, all breaks | 99.9% | 97.5% |
-| clean breaks (nothing lost beyond the break, nothing invented) | 99.8% | 94.9% |
-| clean breaks, `insert {` | 99.8% | 97.1% |
-| clean breaks, `delete }` | 99.5% | 94.5% |
+| declarations kept, all breaks | 100.0% | 97.5% |
+| clean breaks (nothing lost beyond the break, nothing invented) | 100.0% | 94.9% |
+| clean breaks, `insert {` | 100.0% | 97.1% |
+| clean breaks, `delete }` | 100.0% | 94.5% |
 | clean breaks, `delete )` | 100.0% | 92.7% |
-| clean breaks, `insert (` | 100.0% | 95.2% |
+| clean breaks, `insert (` | 99.8% | 95.2% |
 
-gramide is ahead on every kind of break. A `}` deleted resumes at the next
-`fn` or item, where tree-sitter nests what follows into the open body; a `)`
-deleted costs gramide nothing beyond the item that holds it.
+gramide is ahead on every kind of break, and over 2,632 breaks loses two
+declarations beyond the break. A `}` deleted ends its block where the
+indentation does, where tree-sitter nests what follows into the open body;
+a `)` deleted closes where the call or signature it belongs to ends.
 
 ## How it is written
 
